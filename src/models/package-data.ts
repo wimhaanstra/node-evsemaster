@@ -1,26 +1,7 @@
-import { UniversalConstant } from "./models/universal-constant";
+import { stringToBytes } from "./byte-helpers";
+import { UniversalConstant } from "./universal-constant";
 
-function stringToBytes(str: string): Int8Array {
-    const length = str.length;
-    const byteArray = new Int8Array((length + 1) / 2);
-    for (let i = 0; i < length; i += 2) {
-        const substring = str.substring(i, Math.min(2, length - i) + i);
-        const value = parseInt(substring, 16);
-
-        if (value >= 128) {
-            byteArray[i / 2] = value - 256;
-        } else {
-            byteArray[i / 2] = value;
-        }
-    }
-    return byteArray;
-}
-
-function getBytes(str: string): Uint8Array {
-    return new TextEncoder().encode(str);
-}
-
-export function createPackageData(serialNumber: string, password: string, i: number, bArr: Int8Array | null): Int8Array {
+export function createPackageData(serialNumber: string, password: string, command: number, bArr: Int8Array | null): Int8Array {
     const length = bArr ? 25 + bArr.length : 25;
 
     const buffer = new Int8Array(length);
@@ -39,13 +20,13 @@ export function createPackageData(serialNumber: string, password: string, i: num
     buffer.set(serialBytes, offset);
     offset += serialBytes.length;
 
-    const passwordBytes = getBytes(password);
+    const passwordBytes = new TextEncoder().encode(password);
 
     buffer.set(passwordBytes, offset);
     offset += passwordBytes.length;
 
-    buffer[offset++] = i >> 8;
-    buffer[offset++] = i % 256;
+    buffer[offset++] = command >> 8;
+    buffer[offset++] = command % 256;
 
     if (bArr && bArr.length > 0) {
         buffer.set(bArr, offset);
