@@ -31,10 +31,10 @@ export const parseSingleAcStatus = (buffer: Buffer): SingleAcStatus => {
         currentVoltage: bytesToInt(buffer.subarray(1, 3)),
         currentElectricity: bytesToInt(buffer.subarray(3, 5)),
         currentPower: bytesToIntLittle(buffer.subarray(5, 9)),
-        currentAmount: bytesToIntLittle(buffer.subarray(9, 13)),
+        currentAmount: bytesToIntLittle(buffer.subarray(9, 13)) * 0.01,
 
-        innerTemperature: 0,
-        outerTemperature: 0,
+        innerTemperature: (bytesToInt(buffer.subarray(13, 15)) - 20000) * 0.01,
+        outerTemperature: (bytesToInt(buffer.subarray(15, 17)) - 20000) * 0.01,
 
         gunState,
         outputState: byteToIntLittle(buffer[19]),
