@@ -1,10 +1,11 @@
 import { stringToBytes } from "./byte-helpers";
+import { CommandConstant } from "./command-constant";
 import { UniversalConstant } from "./universal-constant";
 
-export function createPackageData(serialNumber: string, password: string, command: number, bArr: Int8Array | null): Int8Array {
+export function createPackageData(serialNumber: string, password: string, command: number, bArr: Int8Array | null): Buffer {
     const length = bArr ? 25 + bArr.length : 25;
 
-    const buffer = new Int8Array(length);
+    const buffer = Buffer.alloc(length);
     let offset = 0;
 
     const headerBytes = stringToBytes(UniversalConstant.PACKET_HEADER);
@@ -43,4 +44,10 @@ export function createPackageData(serialNumber: string, password: string, comman
 
     buffer.set(stringToBytes(UniversalConstant.PACKET_TAIL), offset);
     return buffer;
+}
+
+export const getOutputElectricityPackage = (serialNumber: string, password: string): Buffer => {
+    const buffer = new Int8Array(2);
+    buffer[0] = 2;
+    return createPackageData(serialNumber, password, CommandConstant.s_setAndGetOutputElectricity, buffer);
 }

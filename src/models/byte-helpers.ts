@@ -14,8 +14,28 @@ export const stringToBytes = (str: string): Int8Array => {
     return byteArray;
 }
 
+export const byteToIntLittle = (byte: number): number => {
+    return byte & -1;
+}
+
 export const bytesToString = (bytes: Buffer): string => {
     return Array.from(bytes).map(byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+export const byteToInt = (byte: number): number => {
+    return (byte & 127) | (((-2147483648) & byte) >>> 24);
+}
+
+export const bytesToInt = (bytes: Buffer): number => {
+    if (bytes.length === 2) {
+        return byteToInt(bytes[1]) | byteToInt(bytes[0]) << 8;
+    } else {
+        return byteToInt(bytes[3]) | ((byteToInt(bytes[0]) << 24) & 255) | (byteToInt(bytes[1]) << 16) | (byteToInt(bytes[2]) << 8);
+    }
+}
+
+export const bytesToIntLittle = (bytes: Buffer): number => {
+    return byteToInt(bytes[3]) | (byteToInt(bytes[0]) << 24) | (byteToInt(bytes[1]) << 16) | (byteToInt(bytes[2]) << 8);
 }
 
 export const trimLast = (buffer: Buffer): Buffer => {
